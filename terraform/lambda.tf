@@ -29,22 +29,7 @@ module "lambda_docker_image" {
   image_tag       = "latest"
   ecr_repo        = "${var.resource_tags.project}-${random_string.random.id}"
   depends_on      = [null_resource.lambda_docker_image]
-  ecr_repo_lifecycle_policy = jsonencode({
-    "rules" : [
-      {
-        "rulePriority" : 1,
-        "description" : "Keep only the last 2 images",
-        "selection" : {
-          "tagStatus" : "any",
-          "countType" : "imageCountMoreThan",
-          "countNumber" : 2
-        },
-        "action" : {
-          "type" : "expire"
-        }
-      }
-    ]
-  })
+  ecr_repo_tags   = var.resource_tags
 }
 
 resource "random_string" "random" {
