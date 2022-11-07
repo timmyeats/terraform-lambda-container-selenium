@@ -1,0 +1,9 @@
+#############################################
+# Varaibles
+#############################################
+
+resource_tags = {
+  terraform = "true"
+  project   = "lambda-container-selenium"
+  version   = "1.0"
+}
