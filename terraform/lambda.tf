@@ -26,7 +26,7 @@ module "lambda_docker_image" {
   version         = "4.6.0"
   create_ecr_repo = true
   source_path     = "../context"
-  image_tag       = "latest"
+  image_tag       = var.resource_tags.version
   ecr_repo        = "${var.resource_tags.project}-${random_string.random.id}"
   depends_on      = [null_resource.lambda_docker_image]
   ecr_repo_tags   = var.resource_tags
