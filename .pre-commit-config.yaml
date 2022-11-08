@@ -34,9 +34,9 @@ repos:
       - id: terraform_fmt
       - id: terraform_validate
       - id: terraform_tflint
-      # - id: terraform_tfsec
       - id: terraform_checkov
-      - id: terraform_docs_replace
+      # - id: terraform_tfsec
+      # - id: terraform_docs_replace
 
   # Code Style
   - repo: https://github.com/pycqa/flake8
@@ -63,4 +63,4 @@ repos:
     hooks:
       - id: terraform-docs-go
         args:
-          ["markdown", "table", "--output-file", "README.md", "./terraform"]
+          ["markdown", "table", "--output-file", "../README.md", "./terraform"]
