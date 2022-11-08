@@ -7,7 +7,6 @@ repos:
       - id: check-merge-conflict
       - id: check-vcs-permalinks
       - id: forbid-new-submodules
-      - id: no-commit-to-branch
       - id: check-json
       - id: check-yaml
 
