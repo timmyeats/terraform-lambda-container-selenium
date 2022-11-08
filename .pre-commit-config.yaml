@@ -36,7 +36,6 @@ repos:
       - id: terraform_tflint
       - id: terraform_checkov
       # - id: terraform_tfsec
-      # - id: terraform_docs_replace
 
   # Code Style
   - repo: https://github.com/pycqa/flake8
