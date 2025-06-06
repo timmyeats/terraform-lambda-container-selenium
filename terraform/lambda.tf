@@ -15,11 +15,13 @@ resource "aws_ecr_repository" "lambda_repo" {
   }
 }
 
-# Generate timestamp for unique image tags
+# Generate timestamp for unique image tags (UTC+8)
 locals {
-  timestamp = formatdate("YYYY-MM-DD-hh-mm", timestamp())
+  timestamp = formatdate("YYMMDD-hhmmss", timeadd(timestamp(), "8h"))
   source_hash = md5(join("", [
     filemd5("../context/main.py"),
+    filemd5("../context/font_handler.py"),
+    filemd5("../context/loading_handler.py"),
     filemd5("../context/Dockerfile")
   ]))
 }
@@ -33,17 +35,19 @@ module "lambda_docker_image" {
   ecr_repo        = aws_ecr_repository.lambda_repo.name
   ecr_repo_tags   = var.resource_tags
   source_path     = "../context"
-  image_tag       = "${local.timestamp}-${substr(local.source_hash, 0, 8)}"
+  image_tag       = "v${local.timestamp}"
 
   # Use the existing Dockerfile in context directory
   docker_file_path = "Dockerfile"
 
   # Force rebuild when source code changes
   triggers = {
-    timestamp       = local.timestamp
-    source_hash     = local.source_hash
-    dockerfile_hash = filemd5("../context/Dockerfile")
-    main_py_hash    = filemd5("../context/main.py")
+    timestamp            = local.timestamp
+    source_hash          = local.source_hash
+    dockerfile_hash      = filemd5("../context/Dockerfile")
+    main_py_hash         = filemd5("../context/main.py")
+    font_handler_hash    = filemd5("../context/font_handler.py")
+    loading_handler_hash = filemd5("../context/loading_handler.py")
   }
 }
 
