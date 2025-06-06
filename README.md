@@ -47,8 +47,8 @@ resource_tags = {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.0 |
-| <a name="requirement_docker"></a> [docker](#requirement\_docker) | >= 2.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.0 |
+| <a name="requirement_docker"></a> [docker](#requirement\_docker) | >= 3.0 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | >= 3.0 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | >= 3.0 |
 
@@ -56,22 +56,21 @@ resource_tags = {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.38.0 |
-| <a name="provider_null"></a> [null](#provider\_null) | 3.2.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.4.3 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.99.1 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.7.2 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_lambda_container"></a> [lambda\_container](#module\_lambda\_container) | terraform-aws-modules/lambda/aws | 4.6.0 |
-| <a name="module_lambda_docker_image"></a> [lambda\_docker\_image](#module\_lambda\_docker\_image) | terraform-aws-modules/lambda/aws//modules/docker-build | 4.6.0 |
+| <a name="module_lambda_container"></a> [lambda\_container](#module\_lambda\_container) | terraform-aws-modules/lambda/aws | 7.21.0 |
+| <a name="module_lambda_docker_image"></a> [lambda\_docker\_image](#module\_lambda\_docker\_image) | terraform-aws-modules/lambda/aws//modules/docker-build | 7.21.0 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [null_resource.lambda_docker_image](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
+| [aws_ecr_repository.lambda_repo](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecr_repository) | resource |
 | [random_string.random](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
 | [aws_caller_identity.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_ecr_authorization_token.token](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ecr_authorization_token) | data source |
@@ -88,6 +87,8 @@ resource_tags = {
 
 | Name | Description |
 |------|-------------|
+| <a name="output_ecr_repository_url"></a> [ecr\_repository\_url](#output\_ecr\_repository\_url) | The URL of the ECR repository |
 | <a name="output_lambda_docker_image_uri"></a> [lambda\_docker\_image\_uri](#output\_lambda\_docker\_image\_uri) | The ECR Docker image URI used to deploy Lambda Function |
+| <a name="output_lambda_function_arn"></a> [lambda\_function\_arn](#output\_lambda\_function\_arn) | The ARN of the Lambda Function |
 | <a name="output_lambda_function_name"></a> [lambda\_function\_name](#output\_lambda\_function\_name) | The name of the Lambda Function |
 <!-- END_TF_DOCS -->

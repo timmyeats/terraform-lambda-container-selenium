@@ -1,40 +1,77 @@
-module "lambda_container" {
-  source         = "terraform-aws-modules/lambda/aws"
-  version        = "4.6.0"
-  function_name  = "${var.resource_tags.project}-${random_string.random.id}"
-  description    = "Lambda function from container image"
-  create_package = false
-  memory_size    = 1024
-  timeout        = 60
-  tags           = var.resource_tags
-
-  # Container Image
-  image_uri     = module.lambda_docker_image.image_uri
-  package_type  = "Image"
-  architectures = ["x86_64"]
-}
-
-# Check the main.py status in the context folder
-resource "null_resource" "lambda_docker_image" {
-  triggers = {
-    context = filemd5("../context/main.py")
-  }
-}
-
-module "lambda_docker_image" {
-  source          = "terraform-aws-modules/lambda/aws//modules/docker-build"
-  version         = "4.6.0"
-  create_ecr_repo = true
-  source_path     = "../context"
-  image_tag       = var.resource_tags.version
-  ecr_repo        = "${var.resource_tags.project}-${random_string.random.id}"
-  depends_on      = [null_resource.lambda_docker_image]
-  ecr_repo_tags   = var.resource_tags
-}
-
 resource "random_string" "random" {
   length  = 8
   lower   = true
   upper   = false
   special = false
+}
+
+# ECR repository for Lambda container image
+resource "aws_ecr_repository" "lambda_repo" {
+  name = "${var.resource_tags.project}-${random_string.random.id}"
+  tags = var.resource_tags
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
+# Generate timestamp for unique image tags
+locals {
+  timestamp = formatdate("YYYY-MM-DD-hh-mm", timestamp())
+  source_hash = md5(join("", [
+    filemd5("../context/main.py"),
+    filemd5("../context/Dockerfile")
+  ]))
+}
+
+# Build and push Docker image to ECR
+module "lambda_docker_image" {
+  source  = "terraform-aws-modules/lambda/aws//modules/docker-build"
+  version = "7.21.0"
+
+  create_ecr_repo = false
+  ecr_repo        = aws_ecr_repository.lambda_repo.name
+  ecr_repo_tags   = var.resource_tags
+  source_path     = "../context"
+  image_tag       = "${local.timestamp}-${substr(local.source_hash, 0, 8)}"
+
+  # Use the existing Dockerfile in context directory
+  docker_file_path = "Dockerfile"
+
+  # Force rebuild when source code changes
+  triggers = {
+    timestamp       = local.timestamp
+    source_hash     = local.source_hash
+    dockerfile_hash = filemd5("../context/Dockerfile")
+    main_py_hash    = filemd5("../context/main.py")
+  }
+}
+
+# Lambda function using container image
+module "lambda_container" {
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "7.21.0"
+
+  function_name = "${var.resource_tags.project}-${random_string.random.id}"
+  description   = "Lambda function from container image for Selenium web scraping"
+
+  # Container configuration
+  create_package = false
+  image_uri      = module.lambda_docker_image.image_uri
+  package_type   = "Image"
+  architectures  = ["x86_64"]
+
+  # Function configuration
+  memory_size = 1024
+  timeout     = 300 # 5 minutes for complex scraping tasks
+
+  # Environment variables
+  environment_variables = {
+    ENVIRONMENT = "prod"
+    LOG_LEVEL   = "INFO"
+  }
+
+  tags = var.resource_tags
+
+  depends_on = [module.lambda_docker_image]
 }

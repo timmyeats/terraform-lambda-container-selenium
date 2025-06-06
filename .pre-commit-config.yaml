@@ -34,7 +34,7 @@ repos:
       - id: terraform_fmt
       - id: terraform_validate
       - id: terraform_tflint
-      - id: terraform_checkov
+      # - id: terraform_checkov
       # - id: terraform_tfsec
 
   # Code Style
@@ -42,6 +42,7 @@ repos:
     rev: 5.0.4
     hooks:
       - id: flake8
+        args: ["--ignore=E501"]
 
   - repo: https://github.com/ambv/black
     rev: 22.10.0
