@@ -39,7 +39,9 @@ class ChineseFontHandler:
             .iconfont, [class*="iconfont"],
             select, .select, [class*="select"],
             .dropdown, [class*="dropdown"], [class*="arrow"], [class*="chevron"] {
-                font-family: inherit !important;
+                font-family: 'Font Awesome 5 Free', 'Font Awesome 5 Pro', 'Font Awesome 6 Free', 'Font Awesome 6 Pro',
+                            'Material Icons', 'Material Symbols Outlined', 'iconfont',
+                            -webkit-pictograph, serif !important;
             }
 
             /* 保留偽元素圖示 - 基礎版本 */
@@ -50,7 +52,9 @@ class ChineseFontHandler:
             select::before, select::after,
             .dropdown::before, .dropdown::after,
             [class*="arrow"]::before, [class*="arrow"]::after {
-                font-family: inherit !important;
+                font-family: 'Font Awesome 5 Free', 'Font Awesome 5 Pro', 'Font Awesome 6 Free', 'Font Awesome 6 Pro',
+                            'Material Icons', 'Material Symbols Outlined', 'iconfont',
+                            -webkit-pictograph, serif !important;
             }
 
             * { visibility: visible !important; }
@@ -82,7 +86,9 @@ class ChineseFontHandler:
             select, .select, [class*="select"],
             .dropdown, [class*="dropdown"], [class*="arrow"], [class*="chevron"], [class*="caret"],
             .nav, [class*="nav"], [class*="menu"] {{
-                font-family: inherit !important;
+                font-family: 'Font Awesome 5 Free', 'Font Awesome 5 Pro', 'Font Awesome 6 Free', 'Font Awesome 6 Pro',
+                            'Material Icons', 'Material Symbols Outlined', 'iconfont',
+                            -webkit-pictograph, serif !important;
             }}
 
             /* 保留偽元素圖示 - 增強版本 */
@@ -96,21 +102,25 @@ class ChineseFontHandler:
             .dropdown::before, .dropdown::after,
             [class*="arrow"]::before, [class*="arrow"]::after,
             [class*="chevron"]::before, [class*="chevron"]::after {{
-                font-family: inherit !important;
+                font-family: 'Font Awesome 5 Free', 'Font Awesome 5 Pro', 'Font Awesome 6 Free', 'Font Awesome 6 Pro',
+                            'Material Icons', 'Material Symbols Outlined', 'iconfont',
+                            -webkit-pictograph, serif !important;
             }}
 
             * {{ visibility: visible !important; }}
         """
 
     def get_screenshot_font_css(self):
-        """獲取截圖專用的字體CSS，包含完整的圖示字體保留"""
+        """獲取截圖專用的字體CSS，排除圖示類別避免干擾"""
         return f"""
             @import url('{self.google_fonts_url}');
 
-            /* 中文字體優化 */
+            /* 中文字體優化 - 排除圖示類別 */
             body, div, span, p, h1, h2, h3, h4, h5, h6, a, li, td, th,
             article, section, header, footer, nav, aside, main,
-            .title, .content, .text, .news, .article {{
+            .title, .content, .text, .news, .article,
+            /* 特定排除圖示類別 */
+            :not([class*="ico"]):not([class*="icon"]):not([class*="fa-"]):not(.fa):not(.fas):not(.far):not(.fal):not(.fad):not(.fab) {{
                 font-family: 'Noto Sans TC', 'Noto Sans CJK TC', 'Microsoft JhengHei',
                             '微軟正黑體', 'PingFang TC', sans-serif !important;
                 text-rendering: optimizeLegibility !important;
@@ -118,65 +128,58 @@ class ChineseFontHandler:
                 -moz-osx-font-smoothing: grayscale !important;
             }}
 
-            /* 保留圖示字體 - 基礎類別 */
-            [class*="ico"], [class*="icon"], [class*="fa-"],
-            .fa, .fas, .far, .fal, .fad, .fab, .fass, .fasr, .fasl,
-            [data-icon], [class*="material-icons"], [class*="material-symbols"],
-            .glyphicon, [class*="glyphicon"],
-            .iconfont, [class*="iconfont"],
-            [class*="sprite"], [class*="symbol"],
-            [class*="glyph"], [class*="pictogram"] {{
-                font-family: inherit !important;
+            /* 確保文字可見性，但排除圖示 */
+            :not([class*="ico"]):not([class*="icon"]):not([class*="fa-"]):not(.fa):not(.fas):not(.far):not(.fal):not(.fad):not(.fab) {{
+                visibility: visible !important;
             }}
+        """
 
-            /* 保留下拉選單和導航圖示 */
-            select, .select, [class*="select"],
-            .dropdown, [class*="dropdown"], [class*="drop-down"],
-            .combobox, [class*="combo"],
-            [class*="arrow"], [class*="chevron"], [class*="caret"],
-            .nav, [class*="nav"], [class*="menu"],
-            .btn, [class*="btn"], [class*="button"],
-            [role="combobox"], [role="listbox"], [role="menu"],
-            [aria-haspopup], [class*="popup"] {{
-                font-family: inherit !important;
-            }}
+    def get_icon_fix_css(self):
+        """獲取專門修復圖示顯示問題的CSS - 使用排除策略"""
+        return """
+            /* 🎯 新策略：完全不碰圖示，只確保基本顯示屬性 */
+            .ico, [class*="ico"], .icon, [class*="icon"],
+            [class^="fa-"], [class*=" fa-"], .fa, .fas, .far, .fal, .fad, .fab {
+                /* 只設定顯示相關屬性，不碰字體 */
+                display: inline-block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                /* 清理可能影響的屬性 */
+                text-indent: 0 !important;
+                letter-spacing: normal !important;
+                word-spacing: normal !important;
+                text-decoration: none !important;
+            }
 
-            /* 保留偽元素圖示 - 基礎類別 */
-            [class*="ico"]::before, [class*="ico"]::after,
-            [class*="icon"]::before, [class*="icon"]::after,
-            [class*="fa-"]::before, [class*="fa-"]::after,
-            .fa::before, .fa::after, .fas::before, .fas::after,
-            .far::before, .far::after, .fal::before, .fal::after,
-            .fad::before, .fad::after, .fab::before, .fab::after,
-            .fass::before, .fass::after, .fasr::before, .fasr::after,
-            .fasl::before, .fasl::after {{
-                font-family: inherit !important;
-            }}
+            /* 🔧 偽元素：只確保顯示，不改變任何字體相關屬性 */
+            .ico::before, .ico::after, [class*="ico"]::before, [class*="ico"]::after,
+            .icon::before, .icon::after, [class*="icon"]::before, [class*="icon"]::after,
+            [class^="fa-"]::before, [class*=" fa-"]::before, [class^="fa-"]::after, [class*=" fa-"]::after,
+            .fa::before, .fa::after, .fas::before, .fas::after, .far::before, .far::after,
+            .fal::before, .fal::after, .fad::before, .fad::after, .fab::before, .fab::after {
+                /* 只確保偽元素可見，其他都不碰 */
+                display: inline-block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                text-decoration: none !important;
+            }
 
-            /* 保留下拉選單和導航偽元素 */
-            select::before, select::after,
-            .select::before, .select::after, [class*="select"]::before, [class*="select"]::after,
-            .dropdown::before, .dropdown::after, [class*="dropdown"]::before, [class*="dropdown"]::after,
-            [class*="arrow"]::before, [class*="arrow"]::after,
-            [class*="chevron"]::before, [class*="chevron"]::after,
-            [class*="caret"]::before, [class*="caret"]::after,
-            .nav::before, .nav::after, [class*="nav"]::before, [class*="nav"]::after,
-            [class*="menu"]::before, [class*="menu"]::after,
-            .btn::before, .btn::after, [class*="btn"]::before, [class*="btn"]::after {{
-                font-family: inherit !important;
-            }}
+            /* 🎯 針對導航選單圖示 - 最小干預 */
+            .masthead__nav-link .ico,
+            .masthead__nav-item .ico,
+            .masthead__nav .ico {
+                display: inline-block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+            }
 
-            /* 特殊圖示字體系統保留 */
-            [style*="font-family"][style*="icon"],
-            [style*="font-family"][style*="fa-"],
-            [style*="font-family"][style*="material"],
-            [style*="font-family"][style*="glyph"],
-            [class*="webfont"], [class*="font-icon"] {{
-                font-family: inherit !important;
-            }}
-
-            /* 確保文字可見性 */
-            * {{ visibility: visible !important; }}
+            .masthead__nav-link .ico::before,
+            .masthead__nav-item .ico::before,
+            .masthead__nav .ico::before {
+                display: inline-block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+            }
         """
 
     def apply_basic_fonts(self, driver):
@@ -259,7 +262,7 @@ class ChineseFontHandler:
                 f"""
                 // Remove any existing font styles first
                 const existingFontStyles = document.querySelectorAll(
-                    'style[data-font-fix], style[data-screenshot-fonts]'
+                    'style[data-font-fix], style[data-screenshot-fonts], style[data-icon-fix]'
                 );
                 existingFontStyles.forEach(style => style.remove());
 
@@ -276,10 +279,18 @@ class ChineseFontHandler:
                 style.setAttribute('data-font-fix', 'true');
                 style.textContent = `{self.get_screenshot_font_css()}`;
                 document.head.appendChild(style);
+
+                // Inject icon fix styles
+                const iconStyle = document.createElement('style');
+                iconStyle.setAttribute('data-icon-fix', 'true');
+                iconStyle.textContent = `{self.get_icon_fix_css()}`;
+                document.head.appendChild(iconStyle);
+
                 document.body.offsetHeight; // Force reflow
             """
             )
             print("✅ 截圖字體優化完成")
+            print("🎯 圖示修復CSS已注入")
             return True
         except Exception as e:
             print(f"⚠️ 截圖字體優化失敗: {e}")

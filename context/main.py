@@ -7,6 +7,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from tempfile import mkdtemp
 import time
+from font_handler import ChineseFontHandler  # noqa: F401
+from loading_handler import PageLoadingStrategy, ScreenshotHandler  # noqa: F401
 
 
 def handler(event=None, context=None):
@@ -346,19 +348,11 @@ def handler(event=None, context=None):
                             const existingFontStyles = document.querySelectorAll('style[data-font-fix]');
                             existingFontStyles.forEach(style => style.remove());
 
-                            // Inject comprehensive font styles
+                            // Inject comprehensive font styles with icon protection
                             const style = document.createElement('style');
                             style.setAttribute('data-font-fix', 'true');
                             style.textContent = `
-                                /* 重置所有元素的字體 */
-                                *, *::before, *::after {
-                                    font-family: 'Noto Sans TC', 'Noto Sans CJK TC', 'Microsoft JhengHei', '微軟正黑體', 'PingFang TC', 'Apple LiGothic', 'Hiragino Sans GB', 'WenQuanYi Micro Hei', SimSun, sans-serif !important;
-                                    text-rendering: optimizeLegibility !important;
-                                    -webkit-font-smoothing: antialiased !important;
-                                    -moz-osx-font-smoothing: grayscale !important;
-                                }
-
-                                /* 針對常見文字元素 */
+                                /* 重置文字元素的字體，但保護圖示元素 */
                                 body, div, span, p, h1, h2, h3, h4, h5, h6, a, li, td, th,
                                 article, section, header, footer, nav, aside, main,
                                 .title, .content, .text, .news, .article {
@@ -369,13 +363,67 @@ def handler(event=None, context=None):
                                     font-display: swap !important;
                                 }
 
-                                /* 強制覆蓋可能的內聯樣式 */
-                                [style*="font-family"] {
+                                /* 🎯 關鍵：保護圖示元素，不覆蓋其 font-family */
+                                .ico, [class*="ico"], .icon, [class*="icon"],
+                                [class^="fa-"], [class*=" fa-"], .fa, .fas, .far, .fal, .fad, .fab {
+                                    /* 不設定 font-family，讓原始 CSS 生效 */
+                                    font-style: normal !important;
+                                    font-weight: normal !important;
+                                    font-variant: normal !important;
+                                    text-transform: none !important;
+                                    line-height: 1 !important;
+                                    speak: none !important;
+                                    display: inline-block !important;
+                                    visibility: visible !important;
+                                    opacity: 1 !important;
+                                    -webkit-font-smoothing: antialiased !important;
+                                    -moz-osx-font-smoothing: grayscale !important;
+                                }
+
+                                /* 🔧 保護偽元素圖示 */
+                                .ico::before, .ico::after, [class*="ico"]::before, [class*="ico"]::after,
+                                .icon::before, .icon::after, [class*="icon"]::before, [class*="icon"]::after,
+                                [class^="fa-"]::before, [class*=" fa-"]::before,
+                                .fa::before, .fa::after, .fas::before, .fas::after, .far::before, .far::after {
+                                    /* 保持原始 font-family 和 content */
+                                    font-style: normal !important;
+                                    font-weight: normal !important;
+                                    font-variant: normal !important;
+                                    text-transform: none !important;
+                                    line-height: 1 !important;
+                                    display: inline-block !important;
+                                    visibility: visible !important;
+                                    opacity: 1 !important;
+                                    -webkit-font-smoothing: antialiased !important;
+                                    -moz-osx-font-smoothing: grayscale !important;
+                                }
+
+                                /* 🎯 特別保護 ico-thin-down */
+                                .ico-thin-down, .ico.ico-thin-down {
+                                    display: inline-block !important;
+                                    visibility: visible !important;
+                                    opacity: 1 !important;
+                                    font-style: normal !important;
+                                    font-variant: normal !important;
+                                    line-height: 1 !important;
+                                }
+
+                                .ico-thin-down::before, .ico.ico-thin-down::before {
+                                    display: inline-block !important;
+                                    visibility: visible !important;
+                                    opacity: 1 !important;
+                                    font-style: normal !important;
+                                    font-variant: normal !important;
+                                    line-height: 1 !important;
+                                }
+
+                                /* 強制覆蓋可能的內聯樣式，但排除圖示 */
+                                [style*="font-family"]:not(.ico):not([class*="ico"]):not(.icon):not([class*="icon"]):not([class^="fa-"]):not([class*=" fa-"]) {
                                     font-family: 'Noto Sans TC', 'Noto Sans CJK TC', 'Microsoft JhengHei', '微軟正黑體', 'PingFang TC', 'Apple LiGothic', sans-serif !important;
                                 }
 
-                                /* 確保文字可見性 */
-                                * {
+                                /* 確保一般文字可見性 */
+                                body, div, span, p, h1, h2, h3, h4, h5, h6, a, li, td, th {
                                     color: inherit !important;
                                     visibility: visible !important;
                                 }
@@ -389,9 +437,18 @@ def handler(event=None, context=None):
                             const computedStyle = window.getComputedStyle(document.body);
                             console.log('Applied font-family:', computedStyle.fontFamily);
 
+                            // Check icon elements
+                            const iconElements = document.querySelectorAll('.ico');
+                            iconElements.forEach((icon, index) => {
+                                const iconStyle = window.getComputedStyle(icon);
+                                console.log(`Icon ${index} font-family:`, iconStyle.fontFamily);
+                                console.log(`Icon ${index} content:`, window.getComputedStyle(icon, '::before').content);
+                            });
+
                             return {
                                 appliedFont: computedStyle.fontFamily,
-                                stylesApplied: true
+                                stylesApplied: true,
+                                iconCount: iconElements.length
                             };
                         """
                         )
