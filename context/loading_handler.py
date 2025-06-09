@@ -1,8 +1,7 @@
 """
 頁面載入策略模組
 Page Loading Strategy Module
-
-此模組負責處理現代網站的智能載入策略
+此模組負責處理現代網站的頁面載入策略
 """
 
 import time
@@ -19,14 +18,14 @@ class PageLoadingStrategy:
         self.driver = driver
 
     def execute_smart_loading(self, wait_for=None, wait_timeout=3):
-        """執行智能載入策略"""
-        print("🎯 現代網站智能載入策略...")
+        """執行頁面載入策略"""
+        print("🎯 現代網站頁面載入策略...")
         wait_start = time.time()
 
         # Strategy 1: 立即基本檢查
         page_loaded = self._check_basic_page_info()
 
-        # Strategy 2: 智能內容檢測
+        # Strategy 2: 頁面內容檢測
         content_loaded = self._detect_content()
 
         # Strategy 3: 條件性最小等待
@@ -41,7 +40,7 @@ class PageLoadingStrategy:
         page_status = "✅" if page_loaded else "❌"
         content_status = "✅" if content_loaded else "❌"
         print(
-            f"🏁 載入策略完成 (總耗時: {total_wait_time:.2f}s, 頁面: {page_status}, 內容: {content_status})"
+            f"🏁 載入完成 (總耗時: {total_wait_time:.2f}s, 頁面: {page_status}, 內容: {content_status})"
         )
 
         return {
@@ -65,7 +64,7 @@ class PageLoadingStrategy:
             return False
 
     def _detect_content(self):
-        """智能內容檢測"""
+        """頁面內容檢測"""
         try:
             content_indicators = self.driver.execute_script(
                 """

@@ -337,9 +337,8 @@ class ChromeOptionsBuilder:
 
     @staticmethod
     def get_font_options():
-        """獲取字體渲染優化選項"""
+        """獲取字體渲染優化選項（不包含語系設定）"""
         return [
-            "--lang=zh-TW",
             "--enable-font-antialiasing",
             "--force-device-scale-factor=1",
             "--font-render-hinting=full",
